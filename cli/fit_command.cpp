@@ -2,7 +2,6 @@
 #include <algorithm>
 #include <boost/program_options.hpp>
 #include <format>
-#include <iostream>
 #include <jizai/jizai.hpp>
 #include <memory>
 #include <optional>
@@ -82,7 +81,7 @@ class FitCommand : public Command {
     }
 
     if (global_opts.help) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       return;
     }
 
@@ -95,7 +94,7 @@ class FitCommand : public Command {
                 vm);
       po::notify(vm);
     } catch (const po::error&) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       throw;
     }
 

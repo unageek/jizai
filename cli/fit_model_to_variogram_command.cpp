@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <boost/program_options.hpp>
 #include <format>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/geostats.hpp>
 #include <jizai/jizai.hpp>
 #include <limits>
@@ -18,6 +18,8 @@
 using jizai::Model;
 using jizai::geostats::VariogramFitting;
 using jizai::geostats::VariogramSet;
+
+namespace common = jizai::common;
 
 namespace {
 
@@ -68,7 +70,7 @@ class FitModelToVariogramCommand : public Command {
     }
 
     if (global_opts.help) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       return;
     }
 
@@ -81,7 +83,7 @@ class FitModelToVariogramCommand : public Command {
                 vm);
       po::notify(vm);
     } catch (const po::error&) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       throw;
     }
 
@@ -156,7 +158,7 @@ class FitModelToVariogramCommand : public Command {
       }
     }
 
-    std::cout << best_model.description() << std::endl;
+    common::println("{}", best_model.description());
 
     if (!opts.out_file.empty()) {
       best_model.save(opts.out_file);

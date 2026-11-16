@@ -4,10 +4,9 @@
 #include <algorithm>
 #include <cmath>
 #include <format>
-#include <iomanip>
-#include <iostream>
 #include <jizai/common/macros.hpp>
 #include <jizai/common/orthonormalize.hpp>
+#include <jizai/common/print.hpp>
 #include <jizai/geometry/bbox3d.hpp>
 #include <jizai/geometry/point3d.hpp>
 #include <jizai/interpolation/evaluator.hpp>
@@ -27,6 +26,7 @@
 #include <numeric>
 #include <ranges>
 #include <stdexcept>
+#include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -119,12 +119,12 @@ class RasPreconditioner : public krylov::LinearOperator {
 
     fine_grids_.resize(n_levels_);
 
-    std::cout << std::format("{:>8}{:>16}{:>16}{:>16}", "level", "n_domains", "n_points",
-                             "n_grad_points");
+    auto header =
+        std::format("{:>8}{:>16}{:>16}{:>16}", "level", "n_domains", "n_points", "n_grad_points");
     if (kReportConditionNumbers) {
-      std::cout << std::format("{:>12}{:>12}{:>12}", "cond_min", "cond_med", "cond_max");
+      header += std::format("{:>12}{:>12}{:>12}", "cond_min", "cond_med", "cond_max");
     }
-    std::cout << std::endl;
+    common::println("{}", header);
 
     for (auto level = n_levels_ - 1; level >= 1; level--) {
       auto mu = static_cast<Index>(point_idcs_.at(level).size());
@@ -151,17 +151,17 @@ class RasPreconditioner : public krylov::LinearOperator {
         fine.setup(points_, grad_points_, kReportConditionNumbers);
       }
 
-      std::cout << std::format("{:>8}{:>16}{:>16}{:>16}", level, n_grids, mu, sigma);
+      auto row = std::format("{:>8}{:>16}{:>16}{:>16}", level, n_grids, mu, sigma);
       if (kReportConditionNumbers) {
         std::vector<double> conds;
         for (const auto& fine : fine_grids_.at(level)) {
           conds.push_back(fine.condition_number());
         }
         std::ranges::sort(conds);
-        std::cout << std::format("{:>12.3e}{:>12.3e}{:>12.3e}", conds.front(),
-                                 conds.at(conds.size() / 2), conds.back());
+        row += std::format("{:>12.3e}{:>12.3e}{:>12.3e}", conds.front(), conds.at(conds.size() / 2),
+                           conds.back());
       }
-      std::cout << std::endl;
+      common::println("{}", row);
     }
 
     {
@@ -175,12 +175,12 @@ class RasPreconditioner : public krylov::LinearOperator {
       coarse_ = std::make_unique<CoarseGrid>(model, std::move(coarse_domain));
       coarse_->setup(points_, grad_points_, kReportConditionNumbers);
 
-      std::cout << std::format("{:>8}{:>16}{:>16}{:>16}", 0, 1, mu, sigma);
+      auto row = std::format("{:>8}{:>16}{:>16}{:>16}", 0, 1, mu, sigma);
       if (kReportConditionNumbers) {
         auto cond = coarse_->condition_number();
-        std::cout << std::format("{:>12.3e}{:>12.3e}{:>12.3e}", cond, cond, cond);
+        row += std::format("{:>12.3e}{:>12.3e}{:>12.3e}", cond, cond, cond);
       }
-      std::cout << std::endl;
+      common::println("{}", row);
     }
 
     if (n_levels_ == 1) {
@@ -336,7 +336,7 @@ class RasPreconditioner : public krylov::LinearOperator {
 
   void report_initial_residual(const VecX& residuals) const {
     if (kReportResidual) {
-      std::cout << std::format("Initial residual: {:f}", residuals.norm()) << std::endl;
+      common::println("Initial residual: {:f}", residuals.norm());
     }
   }
 
@@ -344,8 +344,7 @@ class RasPreconditioner : public krylov::LinearOperator {
     if (kReportResidual) {
       finest_evaluator_->set_weights(weights_total);
       VecX residuals = v.head(mu_ + kDim * sigma_) - finest_evaluator_->evaluate();
-      std::cout << std::format("Residual after level {}: {:f}", level, residuals.norm())
-                << std::endl;
+      common::println("Residual after level {}: {:f}", level, residuals.norm());
     }
   }
 

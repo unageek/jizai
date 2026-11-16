@@ -4,7 +4,8 @@
 #include <boost/algorithm/string.hpp>
 #include <format>
 #include <fstream>
-#include <iostream>
+#include <jizai/common/path_from_utf8.hpp>
+#include <jizai/common/print.hpp>
 #include <jizai/numeric/conv.hpp>
 #include <jizai/types.hpp>
 #include <stdexcept>
@@ -14,7 +15,7 @@
 namespace jizai {
 
 inline MatX read_table(const std::string& filename, const char* delimiters = " \t,") {
-  std::ifstream ifs(filename);
+  std::ifstream ifs(common::path_from_utf8(filename));
   if (!ifs) {
     throw std::runtime_error(std::format("cannot open file '{}'", filename));
   }
@@ -38,9 +39,7 @@ inline MatX read_table(const std::string& filename, const char* delimiters = " \
     if (n_cols == 0) {
       n_cols = row_size;
     } else if (row_size != n_cols) {
-      std::cerr << std::format("warning: skipping line {} with a different number of columns",
-                               line_no)
-                << std::endl;
+      common::eprintln("warning: skipping line {} with a different number of columns", line_no);
       continue;
     }
 
@@ -62,7 +61,7 @@ inline MatX read_table(const std::string& filename, const char* delimiters = " \
 template <class Derived>
 void write_table(const std::string& filename, const Eigen::MatrixBase<Derived>& table,
                  char delimiter = ' ') {
-  std::ofstream ofs(filename);
+  std::ofstream ofs(common::path_from_utf8(filename));
   if (!ofs) {
     throw std::runtime_error(std::format("cannot open file '{}'", filename));
   }

@@ -1,5 +1,5 @@
 #include <exception>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/geometry/sphere3d.hpp>
 #include <jizai/jizai.hpp>
 #include <jizai/point_cloud/random_points.hpp>
@@ -10,6 +10,8 @@ using jizai::write_table;
 using jizai::geometry::Sphere3;
 using jizai::point_cloud::DistanceFilter;
 using jizai::point_cloud::random_points;
+
+namespace common = jizai::common;
 
 int main(int /*argc*/, char* argv[]) {
   try {
@@ -24,10 +26,10 @@ int main(int /*argc*/, char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    common::eprintln("error: {}", e.what());
     return 1;
   } catch (...) {
-    std::cerr << "unknown error" << std::endl;
+    common::eprintln("unknown error");
     return 1;
   }
 }

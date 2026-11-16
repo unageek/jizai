@@ -2,8 +2,9 @@
 #include <boost/program_options.hpp>
 #include <exception>
 #include <format>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -46,10 +47,11 @@ int main(int argc, const char* argv[]) {
     commands.push_back(make_variogram_command());
 
     if (args.empty()) {
-      std::cout << "usage: jizai [OPTIONS] COMMAND [ARGS]" << std::endl << opts_desc;
-      std::cout << std::endl << "Commands:" << std::endl;
+      std::ostringstream desc;
+      desc << opts_desc;
+      jizai::common::print("usage: jizai [OPTIONS] COMMAND [ARGS]\n{}\nCommands:\n", desc.str());
       for (const auto& command : commands) {
-        std::cout << std::format("  {:24}{}", command->name(), command->description()) << std::endl;
+        jizai::common::println("  {:24}{}", command->name(), command->description());
       }
       return opts.help ? 0 : 1;
     }
@@ -66,10 +68,10 @@ int main(int argc, const char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    jizai::common::eprintln("error: {}", e.what());
     return 1;
   } catch (...) {
-    std::cerr << "unknown error" << std::endl;
+    jizai::common::eprintln("unknown error");
     return 1;
   }
 }

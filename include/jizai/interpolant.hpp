@@ -6,6 +6,7 @@
 #include <format>
 #include <jizai/common/concatenate.hpp>
 #include <jizai/common/io.hpp>
+#include <jizai/common/print.hpp>
 #include <jizai/geometry/bbox3d.hpp>
 #include <jizai/geometry/point3d.hpp>
 #include <jizai/interpolation/evaluator.hpp>
@@ -241,8 +242,7 @@ class Interpolant {
     VecX weights = VecX::Zero(mu + kDim * sigma + l);
 
     if (model() != initial.model()) {
-      std::cerr << "warning: ignoring the initial interpolant because the model is different"
-                << std::endl;
+      common::eprintln("warning: ignoring the initial interpolant because the model is different");
       return weights;
     }
 

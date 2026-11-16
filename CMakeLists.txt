@@ -28,7 +28,7 @@ endif()
 project(jizai CXX)
 
 set(CMAKE_COMPILE_WARNING_AS_ERROR ON)
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
@@ -36,6 +36,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(jizai_target_contents)
+include(jizai_target_utf8)
 
 find_package(boost_algorithm CONFIG REQUIRED)
 find_package(boost_any CONFIG REQUIRED)

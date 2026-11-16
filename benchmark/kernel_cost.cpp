@@ -5,7 +5,7 @@
 
 #include <algorithm>
 #include <chrono>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/fmm/gradient_kernel.hpp>
 #include <jizai/fmm/gradient_transpose_kernel.hpp>
 #include <jizai/fmm/hessian_kernel.hpp>
@@ -47,6 +47,8 @@ using jizai::rbf::internal::CovSpheroidal7FastPart;
 using jizai::rbf::internal::CovSpheroidal9FastPart;
 using jizai::rbf::internal::Triharmonic2D;
 using jizai::rbf::internal::Triharmonic3D;
+
+namespace common = jizai::common;
 
 namespace {
 
@@ -113,11 +115,12 @@ void measure(const std::string& rbf_name, const std::vector<double>& params) {
   Kernel<Biharmonic3D<Dim>> ref_kernel(ref_rbf);
   Rbf<Dim> rbf(params);
 
-  std::cout << "JIZAI_KERNEL_COST(" << rbf_name << "<" << Dim << ">, "
-            << relative_cost(Kernel<Rbf<Dim>>(rbf), ref_kernel) << ", "
-            << relative_cost(GradientKernel<Rbf<Dim>>(rbf), ref_kernel) << ", "
-            << relative_cost(GradientTransposeKernel<Rbf<Dim>>(rbf), ref_kernel) << ", "
-            << relative_cost(HessianKernel<Rbf<Dim>>(rbf), ref_kernel) << ")\n";
+  auto cost = relative_cost(Kernel<Rbf<Dim>>(rbf), ref_kernel);
+  auto grad_cost = relative_cost(GradientKernel<Rbf<Dim>>(rbf), ref_kernel);
+  auto grad_transpose_cost = relative_cost(GradientTransposeKernel<Rbf<Dim>>(rbf), ref_kernel);
+  auto hessian_cost = relative_cost(HessianKernel<Rbf<Dim>>(rbf), ref_kernel);
+  common::println("JIZAI_KERNEL_COST({}<{}>, {:.3g}, {:.3g}, {:.3g}, {:.3g})", rbf_name, Dim, cost,
+                  grad_cost, grad_transpose_cost, hessian_cost);
 }
 
 template <template <int> class Rbf>
@@ -130,8 +133,7 @@ void measure(const std::string& rbf_name, const std::vector<double>& params) {
 }  // namespace
 
 int main() {
-  std::cout.precision(3);
-  std::cerr << "threads: " << omp_get_max_threads() << '\n';
+  common::eprintln("threads: {}", omp_get_max_threads());
 
   std::vector<double> polyharmonic{1.0};
   std::vector<double> covariance{1.0, 1.0};

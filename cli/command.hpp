@@ -1,6 +1,9 @@
 #pragma once
 
+#include <boost/program_options/options_description.hpp>
+#include <jizai/common/print.hpp>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -28,3 +31,10 @@ class Command {
 };
 
 using CommandPtr = std::unique_ptr<Command>;
+
+inline void print_usage(const std::string& name,
+                        const boost::program_options::options_description& opts_desc) {
+  std::ostringstream desc;
+  desc << opts_desc;
+  jizai::common::print("usage: jizai {} [OPTIONS]\n{}", name, desc.str());
+}

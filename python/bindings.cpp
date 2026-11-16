@@ -4,13 +4,16 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <cstdio>
 #include <format>
+#include <jizai/common/print.hpp>
 #include <jizai/geostats.hpp>
 #include <jizai/jizai.hpp>
 #include <limits>
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <utility>
 #include <variant>
 #include <vector>
@@ -27,6 +30,44 @@ using namespace py::literals;
 namespace {
 
 constexpr double kInfinity = std::numeric_limits<double>::infinity();
+
+// Ignores failures like PySys_FormatStdout() does, keeping any pending exception.
+void flush_python_stream(const char* name) {
+  py::error_scope error_scope;
+  PyObject* stream = PySys_GetObject(name);  // borrowed
+  if (stream == nullptr || stream == Py_None) {
+    return;
+  }
+  PyObject* flush = PyObject_GetAttrString(stream, "flush");
+  PyObject* result = flush != nullptr ? PyObject_CallNoArgs(flush) : nullptr;
+  Py_XDECREF(result);
+  Py_XDECREF(flush);
+  PyErr_Clear();
+}
+
+// PySys_FormatStdout() never raises: if sys.stdout is None or writing to it fails, it writes to C
+// stdout instead. A thread without the GIL (e.g., an OpenMP worker) must not wait for it, since the
+// thread that called into jizai holds it.
+void write_to_sys_stdout(std::string_view text) {
+  if (PyGILState_Check() == 0) {
+    common::write_to_cout(text);
+    return;
+  }
+  PySys_FormatStdout("%s", std::string(text).c_str());  // NOLINT(cppcoreguidelines-pro-type-vararg)
+  flush_python_stream("stdout");
+  // C stdout buffers the fallback when it is a file or a pipe; flush it before file descriptor 1 is
+  // pointed elsewhere (e.g., when an os.dup2() redirect is undone).
+  static_cast<void>(std::fflush(stdout));
+}
+
+void write_to_sys_stderr(std::string_view text) {
+  if (PyGILState_Check() == 0) {
+    common::write_to_cerr(text);
+    return;
+  }
+  PySys_FormatStderr("%s", std::string(text).c_str());  // NOLINT(cppcoreguidelines-pro-type-vararg)
+  flush_python_stream("stderr");
+}
 
 template <class F>
 auto with_dim(Index dim, const F& f) {
@@ -216,6 +257,9 @@ PYBIND11_MODULE(_core, m) {
 
   py::object orig_name = m.attr("__name__");
   m.attr("__name__") = "jizai";
+
+  common::stdout_writer = write_to_sys_stdout;
+  common::stderr_writer = write_to_sys_stderr;
 
   py::class_<NormalEstimator>(m, "NormalEstimator")
       .def(py::init([](const Array& points) {

@@ -4,6 +4,7 @@
 #include <format>
 #include <fstream>
 #include <iostream>
+#include <jizai/common/path_from_utf8.hpp>
 #include <jizai/types.hpp>
 #include <stdexcept>
 #include <string>
@@ -146,7 +147,7 @@ struct Write<Eigen::Matrix<T, Rows, Cols, Options, MaxRows, MaxCols>,
 
 template <class T>
 void load(const std::string& filename, T& t) {
-  std::ifstream ifs(filename, std::ios::binary);
+  std::ifstream ifs(path_from_utf8(filename), std::ios::binary);
   if (!ifs) {
     throw std::runtime_error{std::format("cannot open file '{}'", filename)};
   }
@@ -156,7 +157,7 @@ void load(const std::string& filename, T& t) {
 
 template <class T>
 void save(const std::string& filename, const T& t) {
-  std::ofstream ofs(filename, std::ios::binary);
+  std::ofstream ofs(path_from_utf8(filename), std::ios::binary);
   if (!ofs) {
     throw std::runtime_error{std::format("cannot open file '{}'", filename)};
   }

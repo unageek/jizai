@@ -1,10 +1,9 @@
 #pragma once
 
 #include <Eigen/Core>
-#include <iomanip>
-#include <iostream>
 #include <jizai/common/macros.hpp>
 #include <jizai/common/orthonormalize.hpp>
+#include <jizai/common/print.hpp>
 #include <jizai/geometry/bbox3d.hpp>
 #include <jizai/geometry/point3d.hpp>
 #include <jizai/interpolation/operator.hpp>
@@ -102,10 +101,7 @@ class Solver {
 
     res_eval_.set_values(values);
 
-    std::cout << std::setw(8) << "iter"            //
-              << std::setw(16) << "residual"       //
-              << std::setw(16) << "grad_residual"  //
-              << std::endl;
+    common::println("{:>8}{:>16}{:>16}", "iter", "residual", "grad_residual");
 
     while (true) {
       auto convergence =
@@ -117,12 +113,8 @@ class Solver {
 
       auto prefix = convergence.exact_residual ? "" : "~";
       auto grad_prefix = convergence.exact_grad_residual ? "" : "~";
-      std::cout << std::scientific                                                            //
-                << std::setw(8) << solver.iteration_count()                                   //
-                << std::setw(4) << prefix << std::setw(12) << convergence.residual            //
-                << std::setw(4) << grad_prefix << std::setw(12) << convergence.grad_residual  //
-                << std::endl                                                                  //
-                << std::defaultfloat;
+      common::println("{:>8}{:>4}{:>12.6e}{:>4}{:>12.6e}", solver.iteration_count(), prefix,
+                      convergence.residual, grad_prefix, convergence.grad_residual);
 
       if (convergence.converged) {
         break;
