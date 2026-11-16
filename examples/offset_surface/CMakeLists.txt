@@ -2,6 +2,8 @@ set(TARGET offset_surface)
 
 add_executable(${TARGET} main.cpp)
 
+jizai_target_utf8(${TARGET})
+
 target_link_libraries(${TARGET} PRIVATE
     Boost::any
     Boost::program_options

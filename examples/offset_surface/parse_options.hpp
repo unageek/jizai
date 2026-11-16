@@ -1,9 +1,10 @@
 #pragma once
 
 #include <boost/program_options.hpp>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/jizai.hpp>
 #include <limits>
+#include <sstream>
 #include <string>
 
 #include "../common/bbox.hpp"
@@ -69,7 +70,9 @@ inline Options parse_options(int argc, const char* argv[]) {
               vm);
     po::notify(vm);
   } catch (const po::error&) {
-    std::cout << "usage: offset_surface [OPTIONS]\n" << opts_desc;
+    std::ostringstream desc;
+    desc << opts_desc;
+    jizai::common::print("usage: offset_surface [OPTIONS]\n{}", desc.str());
     throw;
   }
 

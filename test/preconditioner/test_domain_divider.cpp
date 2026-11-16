@@ -2,7 +2,7 @@
 
 #include <Eigen/Core>
 #include <algorithm>
-#include <format>
+#include <jizai/common/print.hpp>
 #include <jizai/geometry/point3d.hpp>
 #include <jizai/preconditioner/domain_divider.hpp>
 #include <jizai/types.hpp>
@@ -13,11 +13,13 @@ using jizai::Index;
 using jizai::geometry::Points;
 using jizai::preconditioner::DomainDivider;
 
+namespace common = jizai::common;
+
 namespace {
 
 template <int Dim>
 void test() {
-  std::cout << std::format("dim: {}", Dim) << std::endl;
+  common::println("dim: {}", Dim);
 
   using DomainDivider = DomainDivider<Dim>;
   using Points = Points<Dim>;

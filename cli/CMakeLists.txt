@@ -22,6 +22,8 @@ set_target_properties(${TARGET} PROPERTIES
     OUTPUT_NAME "jizai"
 )
 
+jizai_target_utf8(${TARGET})
+
 target_link_libraries(${TARGET} PRIVATE
     Boost::any
     Boost::program_options

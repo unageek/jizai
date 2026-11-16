@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cmath>
-#include <iostream>
 #include <iterator>
+#include <jizai/common/print.hpp>
 #include <jizai/common/zip_sort.hpp>
 #include <jizai/geometry/bbox3d.hpp>
 #include <jizai/point_cloud/normal_estimator.hpp>
@@ -264,7 +264,7 @@ void NormalEstimator::orient_closed_surface(Index k) {
     n_connected_components++;
   }
 
-  std::cout << "Number of connected components: " << n_connected_components << std::endl;
+  common::println("Number of connected components: {}", n_connected_components);
 }
 
 }  // namespace jizai::point_cloud

@@ -1,7 +1,6 @@
 #include <chrono>
 #include <exception>
-#include <iomanip>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/jizai.hpp>
 #include <utility>
 
@@ -15,6 +14,8 @@ using jizai::write_table;
 using jizai::common::concatenate_cols;
 using jizai::geometry::Points3;
 using jizai::rbf::CovExponential;
+
+namespace common = jizai::common;
 
 int main(int /*argc*/, char* argv[]) {
   try {
@@ -47,19 +48,17 @@ int main(int /*argc*/, char* argv[]) {
         1e-3 *
         static_cast<double>(
             std::chrono::duration_cast<std::chrono::milliseconds>(eval_end - eval_start).count());
-    std::cout << std::fixed << std::setprecision(3)  //
-              << "fitting took " << fit_time << "s" << std::endl
-              << "evaluation took " << eval_time << "s" << std::endl
-              << std::defaultfloat;
+    common::println("fitting took {:.3f}s", fit_time);
+    common::println("evaluation took {:.3f}s", eval_time);
 
     write_table(argv[3], concatenate_cols<MatX>(prediction_points, prediction_values));
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    common::eprintln("error: {}", e.what());
     return 1;
   } catch (...) {
-    std::cerr << "unknown error" << std::endl;
+    common::eprintln("unknown error");
     return 1;
   }
 }

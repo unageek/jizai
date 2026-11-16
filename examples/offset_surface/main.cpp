@@ -6,7 +6,7 @@
 #include <boost/unordered/unordered_flat_set.hpp>
 #include <cmath>
 #include <exception>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/jizai.hpp>
 #include <limits>
 #include <stdexcept>
@@ -30,6 +30,8 @@ using jizai::isosurface::Faces;
 using jizai::isosurface::FieldFunction;
 using jizai::isosurface::Isosurface;
 using jizai::rbf::Biharmonic3D;
+
+namespace common = jizai::common;
 
 class SignedDistanceField {
   using Halfedge = std::pair<Index, Index>;
@@ -201,10 +203,10 @@ int main(int argc, const char* argv[]) {
 
     return 0;
   } catch (const std::exception& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    common::eprintln("error: {}", e.what());
     return 1;
   } catch (...) {
-    std::cerr << "unknown error" << std::endl;
+    common::eprintln("unknown error");
     return 1;
   }
 }

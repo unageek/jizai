@@ -3,6 +3,7 @@
 #include <Eigen/Core>
 #include <format>
 #include <fstream>
+#include <jizai/common/path_from_utf8.hpp>
 #include <jizai/geometry/point3d.hpp>
 #include <jizai/isosurface/types.hpp>
 #include <jizai/numeric/conv.hpp>
@@ -26,7 +27,7 @@ class Mesh {
   explicit Mesh(EntireTag /*tag*/) : entire_(true) {}
 
   void export_obj(const std::string& filename) const {
-    std::ofstream ofs(filename);
+    std::ofstream ofs(common::path_from_utf8(filename));
     if (!ofs) {
       throw std::runtime_error(std::format("cannot open file '{}'", filename));
     }

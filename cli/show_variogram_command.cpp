@@ -1,7 +1,7 @@
 #include <boost/program_options.hpp>
 #include <cmath>
 #include <format>
-#include <iostream>
+#include <jizai/common/print.hpp>
 #include <jizai/geostats.hpp>
 #include <jizai/jizai.hpp>
 #include <memory>
@@ -14,6 +14,8 @@
 
 using jizai::Index;
 using jizai::geostats::VariogramSet;
+
+namespace common = jizai::common;
 
 namespace {
 
@@ -42,7 +44,7 @@ class ShowVariogramCommand : public Command {
         ;
 
     if (global_opts.help) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       return;
     }
 
@@ -55,7 +57,7 @@ class ShowVariogramCommand : public Command {
                 vm);
       po::notify(vm);
     } catch (const po::error&) {
-      std::cout << std::format("usage: jizai {} [OPTIONS]\n", kName) << opts_desc;
+      print_usage(kName, opts_desc);
       throw;
     }
 
@@ -97,8 +99,7 @@ class ShowVariogramCommand : public Command {
     auto deg = std::numbers::pi / 180.0;
 
     if (opts.id == -1) {
-      std::cout << std::format("  {:>4}  {:>10}  {:>10}  {:>10}\n", "id", "azimuth", "elevation",
-                               "num_pairs");
+      common::println("  {:>4}  {:>10}  {:>10}  {:>10}", "id", "azimuth", "elevation", "num_pairs");
       for (Index i = 0; i < variog_set.num_variograms(); ++i) {
         const auto& v = variog_set.variograms().at(i);
         const auto& dir = v.direction();
@@ -113,8 +114,7 @@ class ShowVariogramCommand : public Command {
           az += 360.0;
         }
 
-        std::cout << std::format("  {:>4}  {:>10.3f}  {:>10.3f}  {:>10}\n", i, az, elev,
-                                 v.num_pairs());
+        common::println("  {:>4}  {:>10.3f}  {:>10.3f}  {:>10}", i, az, elev, v.num_pairs());
       }
     } else {
       const auto& v = variog_set.variograms().at(opts.id);
@@ -123,11 +123,10 @@ class ShowVariogramCommand : public Command {
       auto distance_prec = format_precision(max_distance);
       auto gamma_prec = format_precision(max_gamma);
 
-      std::cout << std::format("  {:>10}  {:>10}  {:>10}\n", "distance", "gamma", "num_pairs");
+      common::println("  {:>10}  {:>10}  {:>10}", "distance", "gamma", "num_pairs");
       for (Index i = 0; i < v.num_bins(); ++i) {
-        std::cout << std::format("  {:>10.{}f}  {:>10.{}f}  {:>10}\n", v.bin_distance().at(i),
-                                 distance_prec, v.bin_gamma().at(i), gamma_prec,
-                                 v.bin_num_pairs().at(i));
+        common::println("  {:>10.{}f}  {:>10.{}f}  {:>10}", v.bin_distance().at(i), distance_prec,
+                        v.bin_gamma().at(i), gamma_prec, v.bin_num_pairs().at(i));
       }
     }
   }

@@ -3,6 +3,7 @@ set(TARGET Unittest)
 add_executable(${TARGET}
     common/test_concatenate.cpp
     common/test_orthonormalize.cpp
+    common/test_utf8_path.cpp
     common/test_zip_sort.cpp
     geometry/test_bbox3d.cpp
     geostats/test_detrend.cpp

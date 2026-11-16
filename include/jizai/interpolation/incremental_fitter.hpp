@@ -3,11 +3,10 @@
 #include <Eigen/Core>
 #include <algorithm>
 #include <boost/unordered/unordered_flat_set.hpp>
-#include <format>
-#include <iostream>
 #include <iterator>
 #include <jizai/common/complementary_indices.hpp>
 #include <jizai/common/macros.hpp>
+#include <jizai/common/print.hpp>
 #include <jizai/common/zip_sort.hpp>
 #include <jizai/geometry/bbox3d.hpp>
 #include <jizai/geometry/point3d.hpp>
@@ -71,11 +70,10 @@ class IncrementalFitter {
 
     while (true) {
       if (mu_full_ > 0) {
-        std::cout << std::format("Number of RBF centers: {} / {}", mu, mu_full_) << std::endl;
+        common::println("Number of RBF centers: {} / {}", mu, mu_full_);
       }
       if (sigma_full_ > 0) {
-        std::cout << std::format("Number of grad RBF centers: {} / {}", sigma, sigma_full_)
-                  << std::endl;
+        common::println("Number of grad RBF centers: {} / {}", sigma, sigma_full_);
       }
 
       Points points = points_full_(centers, kAll);
@@ -123,7 +121,7 @@ class IncrementalFitter {
       auto lb = std::lower_bound(c_residuals.begin(), c_residuals.end(), tolerance);
       auto n_points_need_fitting = static_cast<Index>(std::distance(lb, c_residuals.end()));
       if (mu_full_ > 0) {
-        std::cout << "Number of points to fit: " << n_points_need_fitting << std::endl;
+        common::println("Number of points to fit: {}", n_points_need_fitting);
       }
 
       auto grad_lb =
@@ -131,7 +129,7 @@ class IncrementalFitter {
       auto n_grad_points_need_fitting =
           static_cast<Index>(std::distance(grad_lb, c_grad_residuals.end()));
       if (sigma_full_ > 0) {
-        std::cout << "Number of grad points to fit: " << n_grad_points_need_fitting << std::endl;
+        common::println("Number of grad points to fit: {}", n_grad_points_need_fitting);
       }
 
       if (n_points_need_fitting == 0 && n_grad_points_need_fitting == 0) {
